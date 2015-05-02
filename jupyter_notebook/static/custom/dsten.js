@@ -3,7 +3,9 @@
 Customized for Data Science 10
 taught by Professor DeNero
 
-Modifications:
+Toggle on-off "DS10 Mode" using the check mark in the toolbar.
+
+DS10 Mode contains the following modifications:
 
 1. By default, shift-enter runs all, in place. (bug: jumps down to bottom of page)
 
