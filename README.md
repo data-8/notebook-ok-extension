@@ -1,9 +1,15 @@
 <<<<<<< HEAD
+<<<<<<< HEAD
 # simplify
 Jupyter notebook extension for simple mode and optional ok integration
 =======
 > This fork adds only one small script at /jupyter_notebook/static/notebook/js/ds10.js. Toggle button in toolbar to turn on/off DS10 Mode. In this special mode:
+=======
+> This fork contains one script, at /jupyter_notebook/static/notebook/js/ds10.js. With this script, DS10 Mode is the default; click on the checkmark in the toolbar to toggle this mode on/off. The following describes special features, in DS10 Mode.
+>>>>>>> 65b8596... outlined all features of DS10 mode, code structure
 - By default, shift-enter runs all, in place.
+- Cells are selected
+- Only one mode -- edit mode -- exists, for simplicity.
 
 # Jupyter Notebook
 
