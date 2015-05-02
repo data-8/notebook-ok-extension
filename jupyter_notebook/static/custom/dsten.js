@@ -7,7 +7,7 @@ Toggle on-off "DS10 Mode" using the check mark in the toolbar.
 
 DS10 Mode contains the following modifications:
 
-1. By default, shift-enter runs all, in place. (bug: jumps down to bottom of page)
+1. By default, shift-enter runs all, in place.
 2. All cells are immediately selected and editable upon hover.
 3. Only edit mode exists:
     a. One code cell is selected at all times, for text input.
@@ -31,16 +31,12 @@ define([
         IPython.toolbar.add_buttons_group([
             {
                 'label'   : 'toggle DS10 mode',
-                'icon'    : 'fa-check-square-o', // select your icon from http://fortawesome.github.io/Font-Awesome/icons
+                // fortawesome.github.io/Font-Awesome/icons
+                'icon'    : 'fa-check-square-o',
                 'callback': function () {
                     var button = $(this).children('i');
-                    if (button.hasClass('fa-square-o')) {
-                        window.ds10 = true;
-                        button.removeClass('fa-square-o').addClass('fa-check-square-o');
-                    } else {
-                        window.ds10 = false;
-                        button.removeClass('fa-check-square-o').addClass('fa-square-o');
-                    }
+                    button.toggleClass('fa-square-o').toggleClass('fa-check-square-o');
+                    window.ds10 = button.hasClass('fa-check-square-o');
                 }
             }
         ]);
@@ -56,10 +52,10 @@ define([
         ];
         
         function shiftEnter(e) {
-            var cell = $('.cell.selected');
-            $('#run_all_cells').click();
-            cell.click();
-            $(window).scrollTop(0);
+            $('.cell').each(function() {
+                $(this).click();
+                $('#run_cell').click();
+            });
         }
         
         // inner workings
@@ -94,9 +90,7 @@ define([
         });
         
         function select_first_cell() {
-            // on load, select a cell, and focus -- maintains invariant 
-            // that one cell is selected at all times
-            $('.cell:first-child .CodeMirror-lines').click();
+            $('.cell:first-child').click();
         }
         
         select_first_cell();
