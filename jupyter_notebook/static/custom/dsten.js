@@ -22,20 +22,21 @@ define([
      events.on('app_initialized.NotebookApp', function(){
 
         /*
-        Enabling and Disabling DS10 Mode
+        
+        DS10 Mode Button
+        
         - adds a button to the notebook toolbar
         - toggles a global ds10 mode variable
-        */
         
-        window.ds10 = true;
-        label = 'toggle DS10 mode';
+        icon: fortawesome.github.io/Font-Awesome/icons
+        
+        */
 
         IPython.toolbar.add_buttons_group([
             {
-                'label'   : label,
-                // fortawesome.github.io/Font-Awesome/icons
+                'label'   : 'DS10 Toggle',
                 'icon'    : 'fa-check-square-o',
-                'callback': function () {
+                'callback': function() {
                     var button = $(this).children('i');
                     button.toggleClass('fa-square-o').toggleClass('fa-check-square-o');
                     window.ds10 = button.hasClass('fa-check-square-o');
@@ -44,36 +45,43 @@ define([
             }
         ]);
         
-        /*
-        Custom Commands
-        - run only if global ds10 mode is turned on
-        */
-             
-        // commands
-        var arrShortCut = [
-            { name: 'shift-enter', key: 13, fx: shiftEnter }
-        ];
-        
-        function shiftEnter(e) {
-            $('.cell').each(function() {
-                $(this).click();
-                $('#run_cell').click();
-            });
+        function add_ds10_label() {
+            $('.fa-check-square-o').html('    DS10 mode <b>on</b>');
         }
         
-        // inner workings
-        var iShortCutControlKey = 16; // SHIFT;
-        var bIsControlKeyActived = false;
+        /*
         
-        // http://www.sitepoint.com/jquery-capture-multiple-key-press-combinations/
+        Custom Commands
+        
+        - run only if global ds10 mode is turned on
+        
+        Ref: http://www.sitepoint.com/jquery-capture-multiple-key-press-combinations/
+        
+        */
+             
+        var shortcuts = [
+            {
+                // Run all cells on shift-enter
+                key: 13,
+                func: function() {
+                    $('.cell').each(function() {
+                        run(this);
+                    });
+                }
+            }
+        ];
+
+        var shift = 16;
+        var shifted = false;
+        
         $(document).keyup(function(e) {
-            if (e.which == iShortCutControlKey) bIsControlKeyActived = false;
+            if (e.which == shift) shifted = false;
         }).keydown(function(e) {
-            if (e.which == iShortCutControlKey) bIsControlKeyActived = true;
-            if (bIsControlKeyActived == true && window.ds10) {
-                jQuery.each(arrShortCut, function(i) {
-                    if (arrShortCut[i].key == e.which) {
-                        arrShortCut[i].fx(e);
+            if (e.which == shift) shifted = true;
+            if (shifted == true && window.ds10) {
+                jQuery.each(shortcuts, function(i) {
+                    if (shortcuts[i].key == e.which) {
+                        shortcuts[i].func(e);
                         throw '';
                     }
                 });
@@ -81,33 +89,47 @@ define([
         });
         
         /*
+        
         Preventing Other Modes
+        
+        - make text cell editable on hover
+        - select the first cell on load
+        
         */
 
-        // select and focus on hover
-        $(document).on('mouseenter', '.cell', function() {
-           
+        $(document).on('mouseenter', '.text_cell', function() {
+            keep_state(select_cell, this);
         });
+
+        function keep_state(func, arg) {
+            var cell = $('.selected');
+            if (arg == null) func();
+            else func(arg);
+            select_cell(cell);
+        }
         
-        // if text cell, prettify before leaving
-        $(document).on('mouseleave', '.cell_text', function() {
-            
-        });
+        function select_cell(self) {
+            console.log('DS10: Auto-selecting cell.');
+            $(self).click().dblclick();
+        }
         
-        // select the first select on load
-        function select_first_cell() {
-            $('.cell:first-child').click().focus();
+        function run(self) {
+            console.log('DS10: Auto-running cell.');
+            $(self).click();
+            $('#run_cell').click();
         }
         
         /*
+        
         DS10 Mode Setup
+        
+        - add a label to the DS10 Button
+        - select the first cell on load
+        
         */
         
-        function add_ds10_label() {
-            $('.btn[title="'+label+'"] i').html('    DS10 mode <b>on</b>');
-        }
-        
+        window.ds10 = true;
         add_ds10_label();
-        select_first_cell();
+        select_cell($('.cell:first-child'));
      });
 });
