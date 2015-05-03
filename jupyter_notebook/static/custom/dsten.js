@@ -93,7 +93,7 @@ define([
         Preventing Other Modes
         
         - make text cell editable on hover
-        - select the first cell on load
+        - select the first cell on load (buggy)
         
         */
 
@@ -107,18 +107,15 @@ define([
 
         function keep_state(func, arg) {
             var cell = $('.selected');
-            if (arg == null) func();
-            else func(arg);
+            func(arg);
             select_cell(cell);
         }
         
         function select_cell(self) {
-            console.log('DS10: Auto-selecting cell.');
             $(self).click().dblclick();
         }
         
         function run(self) {
-            console.log('DS10: Auto-running cell.');
             $(self).click();
             $('#run_cell').click();
         }
