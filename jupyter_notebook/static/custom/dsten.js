@@ -98,8 +98,12 @@ define([
         */
 
         $(document).on('mouseenter', '.text_cell', function() {
-            keep_state(select_cell, this);
+            if (window.ds10) keep_state(select_cell, this);
         });
+        
+        $(document).on('mouseenter', '.out_prompt_overlay', function() {
+            if (window.ds10) $(this).hide();
+        })
 
         function keep_state(func, arg) {
             var cell = $('.selected');
