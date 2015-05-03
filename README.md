@@ -1,6 +1,7 @@
 <<<<<<< HEAD
 <<<<<<< HEAD
 <<<<<<< HEAD
+<<<<<<< HEAD
 # simplify
 Jupyter notebook extension for simple mode and optional ok integration
 =======
@@ -13,6 +14,11 @@ Jupyter notebook extension for simple mode and optional ok integration
 >>>>>>> 5040e15... code shortened, clarified - fixed shift-enter scroll bug (different scheme)
 - By default, shift-enter runs all, in place.
 - Cells are selected upon hover.
+=======
+> This fork contains one script, at /jupyter_notebook/static/notebook/js/ds10.js. With this script, DS10 Mode is the default; click on the "DS10 Mode" button to toggle this mode on/off. The following describes special features, in DS10 Mode.
+- By default, shift-enter runs all cells.
+- Cells are editable upon hover.
+>>>>>>> bca2cd4... ds10 button labeled, on/off state explicitly stated
 - Only one mode -- edit mode -- exists, for simplicity.
 
 # Jupyter Notebook
