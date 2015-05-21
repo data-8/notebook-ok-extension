@@ -104,11 +104,15 @@ define([
             cmd.clear_shortcuts();
             edt.clear_shortcuts();
             add_simple_shortcuts();
+            $('.simple_modal').show();
+            $('head').append(window.simple_modal_style);
         }
         
         function restore_command_mode() {
             restore_object('commands', cmd);
-            restore_object('edits', edt)
+            restore_object('edits', edt);
+            $('#simple_mode').remove();
+            $('.simple_modal').hide();
         }
         
         function add_simple_shortcuts() {
@@ -194,19 +198,22 @@ define([
         initialize_simple_modal();
         
         $(document).ready(function() {
-            $('head').append('<style id="simple_mode">'
-            +'.prompt, .input_prompt,.out_prompt_overlay { display:none }'
-            +'#notebook-container .code_cell:nth-child(2) { position:fixed; top:100%;'
-            +'right:5px; width:300px;border:none; z-index:10; background-color:#FFF; }'
-            +'#notebook-container .code_cell.show { top:auto; bottom:65px; }'
-            +'.simple_modal { position:fixed; width:300px; bottom:0; right:0;'
-            +'background-color:#2B4970; color:#FFF; z-index:20; line-height:60px; text-align:center;'
-            +'cursor:pointer; text-transform:uppercase; letter-spacing:2px; '
-            +'border-radius:3px; margin:5px }'
-            +'.simple_modal.show { background-color:#666 }'
-            +'</style>');
+            $('head').append(window.simple_modal_style);
             $('#notebook').append('<div class="simple_modal" onclick="toggle_simple_modal()">Scratch Cell</div>');
         });
+        
+        window.simple_modal_style = '<style id="simple_mode">'
+        +'.prompt, .input_prompt,.out_prompt_overlay { display:none }'
+        +'#notebook-container .code_cell:nth-child(2) { position:fixed; top:100%;'
+        +'right:5px; width:300px;border:none; z-index:10; background-color:#FFF; }'
+        +'#notebook-container .code_cell.show { top:auto; bottom:65px; }'
+        +'.simple_modal { position:fixed; width:300px; bottom:0; right:0;'
+        +'background-color:#2B4970; color:#FFF; z-index:20; line-height:60px; text-align:center;'
+        +'cursor:pointer; text-transform:uppercase; letter-spacing:2px; '
+        +'border-radius:3px; margin:5px }'
+        +'.simple_modal:hover { background-color:#143054} '
+        +'.simple_modal.show { background-color:#666 }'
+        +'</style>'
         
      });
 });
