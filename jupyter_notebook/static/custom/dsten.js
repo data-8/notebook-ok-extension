@@ -8,11 +8,11 @@ Toggle on-off "Simple Mode" using the check mark in the toolbar.
 Simple Mode contains the following modifications:
 
 1. By default, shift-enter runs all cells.
-2. Cells are editable upon hover.
-3. Only edit mode exists:
-    a. One code cell is selected at all times, for text input.
-    b. Typed characters are always entered as text and not as commands.
-    c. The first code cell is selected upon page load.
+2. Only edit mode exists:
+    a. All command mode shortcuts are removed.
+    b. The first code cell is selected upon page load.
+    c. Markdown-formatted cells are automatically editable upon hover.
+3. Small "scratch cell" modal is available for testing code outside of the current file.
 */
 
 define([
@@ -43,9 +43,30 @@ define([
                     button.children('b').html(window.simple ? 'on' : 'off');
                     if (window.simple) remove_command_mode();
                     else restore_command_mode();
+                    toggle([
+                        '.input_prompt',
+                        '.dropdown:nth-child(2)',
+                        '.dropdown:nth-child(4)',
+                        '.dropdown:nth-child(5)',
+                        '.btn-group[id="insert_above_below"]',
+                        '.btn-group[id="cut_copy_paste"]',
+                        '.btn-group[id="move_up_down"]',
+                        '.btn-group[id="run_int"] .btn:first-child',
+                        '.form-control',
+                        '.btn-group .navbar-text'],
+                        'display', 'none', 'inline-block');
                 }
             }
         ]);
+        
+        /*
+                
+        Simple Mode Setup
+        
+        - add a label to the DS10 Button
+        - select the first cell on load
+        
+        */
         
         function initialize_simple_mode() {
             $('.fa-square-o').html('    Simple mode <b>on</b>').click();
@@ -53,19 +74,45 @@ define([
         }
         
         function remove_command_mode() {
-            obj = IPython.keyboard_manager.command_shortcuts
-            window.store = {}
-            for (var key in obj) {
-                if (obj.hasOwnProperty(key)) {
-                    window.store[key] = obj[key]
-                }
-            }
-            obj.clear_shortcuts()
+            console.log('Simple Mode: Command mode deactivated.');
+            kbd = IPython.keyboard_manager;
+            cmd = kbd.command_shortcuts;
+            edt = kbd.edit_shortcuts;
+            freeze_object('commands', cmd);
+            freeze_object('edits', edt);
+            cmd.clear_shortcuts()
+            edt.clear_shortcuts()
         }
         
         function restore_command_mode() {
-            for (var key in window.store) {
-                IPython.keyboard_manager.command_shortcuts[key] = window.store[key]
+            console.log('Simple Mode: Command mode restored.')
+            kbd = IPython.keyboard_manager;
+            cmd = kbd.command_shortcuts;
+            edt = kbd.edit_shortcuts;
+            restore_object('commands', cmd);
+            restore_object('edits', edt)
+        }
+        
+        function freeze_object(variable, obj) {
+            window[variable] = {};
+            for (var key in obj) {
+                if (obj.hasOwnProperty(key)) {
+                    window[variable][key] = obj[key];
+                }
+            }
+        }
+        
+        function restore_object(variable, obj) {
+            for (var key in window[variable]) {
+                obj[key] = window[variable][key];
+            }
+        }
+        
+        function toggle(list, attr, option1, option2) {
+            var option = window.simple ? option1 : option2;
+            for (var i in list) {
+                item = list[i];
+                $(item).css(attr, option);
             }
         }
         
@@ -84,7 +131,7 @@ define([
                 // Run all cells on shift-enter
                 key: 13,
                 func: function() {
-                    $('.cell').each(function() {
+                    $('.code_cell').each(function() {
                         run(this);
                     });
                 }
@@ -102,7 +149,6 @@ define([
                 jQuery.each(shortcuts, function(i) {
                     if (shortcuts[i].key == e.which) {
                         shortcuts[i].func(e);
-                        throw '';
                     }
                 });
             }
@@ -143,14 +189,19 @@ define([
         
         /*
         
-        Simple Mode Setup
+        "Scratch Cell" Modal
         
-        - add a label to the DS10 Button
-        - select the first cell on load
+        - ever-present small bar in bottom-right
+        - a single cell on expand
+        - shift+enter runs only this cell
         
         */
         
-        initialize_simple_mode()
+        initialize_simple_mode();
+        
+        $(document).ready(function() {
+            $('.input_prompt').css('display', 'none');
+        });
         
      });
 });
