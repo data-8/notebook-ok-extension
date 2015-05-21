@@ -2,6 +2,7 @@
 <<<<<<< HEAD
 <<<<<<< HEAD
 <<<<<<< HEAD
+<<<<<<< HEAD
 # simplify
 Jupyter notebook extension for simple mode and optional ok integration
 =======
@@ -16,6 +17,9 @@ Jupyter notebook extension for simple mode and optional ok integration
 - Cells are selected upon hover.
 =======
 > This fork contains one script, at /jupyter_notebook/static/notebook/js/ds10.js. With this script, DS10 Mode is the default; click on the "DS10 Mode" button to toggle this mode on/off. The following describes special features, in DS10 Mode.
+=======
+> This fork contains one script, at /jupyter_notebook/static/notebook/js/ds10.js. With this script, Simple Mode is the default; click on the " Mode" button to toggle this mode on/off. The following describes special features, in Simple Mode.
+>>>>>>> 0ebc47c... attempted forcibly removing 'command_mode' class and keyboard_manager.disable()
 - By default, shift-enter runs all cells.
 <<<<<<< HEAD
 - Cells are editable upon hover.

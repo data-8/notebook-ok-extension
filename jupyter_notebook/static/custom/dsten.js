@@ -3,9 +3,9 @@
 Customized for Data Science 10
 taught by Professor DeNero
 
-Toggle on-off "DS10 Mode" using the check mark in the toolbar.
+Toggle on-off "Simple Mode" using the check mark in the toolbar.
 
-DS10 Mode contains the following modifications:
+Simple Mode contains the following modifications:
 
 1. By default, shift-enter runs all cells.
 2. Cells are editable upon hover.
@@ -23,10 +23,10 @@ define([
 
         /*
         
-        DS10 Mode Button
+        Simple Mode Button
         
         - adds a button to the notebook toolbar
-        - toggles a global ds10 mode variable
+        - toggles a global simple mode variable
         
         icon: fortawesome.github.io/Font-Awesome/icons
         
@@ -34,26 +34,26 @@ define([
 
         IPython.toolbar.add_buttons_group([
             {
-                'label'   : 'DS10 Toggle',
+                'label'   : 'Simple Mode Toggle',
                 'icon'    : 'fa-check-square-o',
                 'callback': function() {
                     var button = $(this).children('i');
                     button.toggleClass('fa-square-o').toggleClass('fa-check-square-o');
-                    window.ds10 = button.hasClass('fa-check-square-o');
-                    button.children('b').html(window.ds10 ? 'on' : 'off');
+                    window.simple = button.hasClass('fa-check-square-o');
+                    button.children('b').html(window.simple ? 'on' : 'off');
                 }
             }
         ]);
         
-        function add_ds10_label() {
-            $('.fa-check-square-o').html('    DS10 mode <b>on</b>');
+        function add_simple_label() {
+            $('.fa-check-square-o').html('    Simple mode <b>on</b>');
         }
         
         /*
         
         Custom Commands
         
-        - run only if global ds10 mode is turned on
+        - run only if global simple mode is turned on
         
         Ref: http://www.sitepoint.com/jquery-capture-multiple-key-press-combinations/
         
@@ -78,7 +78,7 @@ define([
             if (e.which == shift) shifted = false;
         }).keydown(function(e) {
             if (e.which == shift) shifted = true;
-            if (shifted == true && window.ds10) {
+            if (shifted == true && window.simple) {
                 jQuery.each(shortcuts, function(i) {
                     if (shortcuts[i].key == e.which) {
                         shortcuts[i].func(e);
@@ -92,17 +92,24 @@ define([
         
         Preventing Other Modes
         
+        - forcibly restore command mode to edit mode on switch
         - make text cell editable on hover
         - select the first cell on load (buggy)
         
         */
+        
+        function revive() {
+            if ($('.notebook_app').hasClass('command_mode')) {
+                $('.notebook_app').removeClass('command_mode').addClass('edit_mode');
+            }
+        }
 
         $(document).on('mouseenter', '.text_cell', function() {
-            if (window.ds10) keep_state(select_cell, this);
+            if (window.simple) keep_state(select_cell, this);
         });
         
         $(document).on('mouseenter', '.out_prompt_overlay', function() {
-            if (window.ds10) $(this).hide();
+            if (window.simple) $(this).hide();
         })
 
         function keep_state(func, arg) {
@@ -120,17 +127,19 @@ define([
             $('#run_cell').click();
         }
         
+        revert = setInterval(revive, 1000)
+        
         /*
         
-        DS10 Mode Setup
+        Simple Mode Setup
         
         - add a label to the DS10 Button
         - select the first cell on load
         
         */
         
-        window.ds10 = true;
-        add_ds10_label();
+        window.simple = true;
+        add_simple_label();
         select_cell($('.cell:first-child'));
      });
 });
