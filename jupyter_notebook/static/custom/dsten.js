@@ -45,6 +45,8 @@ define([
                     else restore_command_mode();
                     toggle([
                         '.input_prompt',
+                        '.prompt',
+                        '.out_prompt_overlay',
                         '.dropdown:nth-child(2)',
                         '.dropdown:nth-child(4)',
                         '.dropdown:nth-child(5)',
@@ -78,7 +80,8 @@ define([
         */
         
         function initialize_simple_mode() {
-            $('.fa-square-o').html('    Simple mode <b>on</b>').click();
+            $('.fa-square-o').html('    Simple mode <b>on</b>').click()
+            .parents('.btn-group').css('float','right');
             select_cell($('.cell:first-child'));
         }
         
@@ -113,7 +116,7 @@ define([
                 if (window.modal) {
                     run($('.modal_cell'));
                 } else {
-                    $('.code_cell').each(function() {
+                    $('.code_cell:not(.modal_cell)').each(function() {
                         run(this);
                     });
                 }
@@ -148,10 +151,6 @@ define([
         $(document).on('mouseenter', '.text_cell', function() {
             if (window.simple) keep_state(select_cell, this);
         });
-        
-        $(document).on('mouseenter', '.out_prompt_overlay', function() {
-            if (window.simple) $(this).hide();
-        })
 
         function keep_state(func, arg) {
             var cell = $('.selected');
@@ -180,21 +179,14 @@ define([
         
         function initialize_simple_modal() {
             window.modal = false;
-            add_modal();
-            
+            $('#insert-cell-below').click();
         }
         
-        function add_modal() {
-            
-        }
-        
-        function toggle_modal() {
+        window.toggle_simple_modal = function() {
+            $('.code_cell:nth-child(2)').toggleClass('show');
             $('.simple_modal').toggleClass('show');
+            window.modal = $('.code_cell:nth-child(2)').hasClass('show');
         }
-        
-        $('.simple_modal').on('click', function() {
-            window.modal = $('.simple_modal').hasClass('show');
-        });
         
         // basic initializers
         
@@ -202,7 +194,18 @@ define([
         initialize_simple_modal();
         
         $(document).ready(function() {
-            $('head').append('<style id="simple_mode">.input_prompt { display:none }</style>');
+            $('head').append('<style id="simple_mode">'
+            +'.prompt, .input_prompt,.out_prompt_overlay { display:none }'
+            +'#notebook-container .code_cell:nth-child(2) { position:fixed; top:100%;'
+            +'right:5px; width:300px;border:none; z-index:10; background-color:#FFF; }'
+            +'#notebook-container .code_cell.show { top:auto; bottom:65px; }'
+            +'.simple_modal { position:fixed; width:300px; bottom:0; right:0;'
+            +'background-color:#2B4970; color:#FFF; z-index:20; line-height:60px; text-align:center;'
+            +'cursor:pointer; text-transform:uppercase; letter-spacing:2px; '
+            +'border-radius:3px; margin:5px }'
+            +'.simple_modal.show { background-color:#666 }'
+            +'</style>');
+            $('#notebook').append('<div class="simple_modal" onclick="toggle_simple_modal()">Scratch Cell</div>');
         });
         
      });
