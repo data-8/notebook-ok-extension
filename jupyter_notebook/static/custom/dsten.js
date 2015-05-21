@@ -35,18 +35,38 @@ define([
         IPython.toolbar.add_buttons_group([
             {
                 'label'   : 'Simple Mode Toggle',
-                'icon'    : 'fa-check-square-o',
+                'icon'    : 'fa-square-o',
                 'callback': function() {
                     var button = $(this).children('i');
                     button.toggleClass('fa-square-o').toggleClass('fa-check-square-o');
                     window.simple = button.hasClass('fa-check-square-o');
                     button.children('b').html(window.simple ? 'on' : 'off');
+                    if (window.simple) remove_command_mode();
+                    else restore_command_mode();
                 }
             }
         ]);
         
-        function add_simple_label() {
-            $('.fa-check-square-o').html('    Simple mode <b>on</b>');
+        function initialize_simple_mode() {
+            $('.fa-square-o').html('    Simple mode <b>on</b>').click();
+            select_cell($('.cell:first-child'));
+        }
+        
+        function remove_command_mode() {
+            obj = IPython.keyboard_manager.command_shortcuts
+            window.store = {}
+            for (var key in obj) {
+                if (obj.hasOwnProperty(key)) {
+                    window.store[key] = obj[key]
+                }
+            }
+            obj.clear_shortcuts()
+        }
+        
+        function restore_command_mode() {
+            for (var key in window.store) {
+                IPython.keyboard_manager.command_shortcuts[key] = window.store[key]
+            }
         }
         
         /*
@@ -97,8 +117,6 @@ define([
         - select the first cell on load (buggy)
         
         */
-        
-        IPython.keyboard_manager.command_shortcuts.clear_shortcuts()
 
         $(document).on('mouseenter', '.text_cell', function() {
             if (window.simple) keep_state(select_cell, this);
@@ -132,8 +150,7 @@ define([
         
         */
         
-        window.simple = true;
-        add_simple_label();
-        select_cell($('.cell:first-child'));
+        initialize_simple_mode()
+        
      });
 });
