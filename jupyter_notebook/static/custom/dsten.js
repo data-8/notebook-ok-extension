@@ -73,6 +73,7 @@ define([
             select_cell($('.cell:first-child'));
         }
         
+        // freeze and empty shortcut objects
         function remove_command_mode() {
             console.log('Simple Mode: Command mode deactivated.');
             kbd = IPython.keyboard_manager;
@@ -80,10 +81,12 @@ define([
             edt = kbd.edit_shortcuts;
             freeze_object('commands', cmd);
             freeze_object('edits', edt);
-            cmd.clear_shortcuts()
-            edt.clear_shortcuts()
+            console.log(edt.get_shortcut('shift-enter'));
+            cmd.clear_shortcuts();
+            edt.clear_shortcuts();
         }
         
+        // restore shortcut objects from save
         function restore_command_mode() {
             console.log('Simple Mode: Command mode restored.')
             kbd = IPython.keyboard_manager;
@@ -93,6 +96,7 @@ define([
             restore_object('edits', edt)
         }
         
+        // freeze objects
         function freeze_object(variable, obj) {
             window[variable] = {};
             for (var key in obj) {
@@ -102,12 +106,14 @@ define([
             }
         }
         
+        // restore objects
         function restore_object(variable, obj) {
             for (var key in window[variable]) {
                 obj[key] = window[variable][key];
             }
         }
         
+        // toggle specified CSS attribute between two options, based on Simple Mode for a list
         function toggle(list, attr, option1, option2) {
             var option = window.simple ? option1 : option2;
             for (var i in list) {
@@ -128,12 +134,16 @@ define([
              
         var shortcuts = [
             {
-                // Run all cells on shift-enter
+                // Run all cells on shift-enter if modal not selected
                 key: 13,
                 func: function() {
-                    $('.code_cell').each(function() {
-                        run(this);
-                    });
+                    if (window.modal) {
+                        run($('.modal_cell'));
+                    } else {
+                        $('.code_cell').each(function() {
+                            run(this);
+                        });
+                    }
                 }
             }
         ];
@@ -197,10 +207,30 @@ define([
         
         */
         
+        function initialize_simple_modal() {
+            add_modal();
+            
+        }
+        
+        function add_modal() {
+            
+        }
+        
+        function toggle_modal() {
+            $('.simple_modal').toggleClass('show');
+        }
+        
+        $('.simple_modal').on('click', function() {
+            window.modal = $('.simple_modal').hasClass('show');
+        });
+        
+        // basic initializers
+        
         initialize_simple_mode();
+        initialize_simple_modal();
         
         $(document).ready(function() {
-            $('.input_prompt').css('display', 'none');
+            $('head').append('<style id="simple_mode">.input_prompt { display:none }</style>');
         });
         
      });
