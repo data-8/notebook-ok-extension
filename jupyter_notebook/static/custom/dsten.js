@@ -92,17 +92,13 @@ define([
         
         Preventing Other Modes
         
-        - forcibly restore command mode to edit mode on switch
+        - destroy all "command mode" shortcuts
         - make text cell editable on hover
         - select the first cell on load (buggy)
         
         */
         
-        function revive() {
-            if ($('.notebook_app').hasClass('command_mode')) {
-                $('.notebook_app').removeClass('command_mode').addClass('edit_mode');
-            }
-        }
+        IPython.keyboard_manager.command_shortcuts.clear_shortcuts()
 
         $(document).on('mouseenter', '.text_cell', function() {
             if (window.simple) keep_state(select_cell, this);
@@ -126,8 +122,6 @@ define([
             $(self).click();
             $('#run_cell').click();
         }
-        
-        revert = setInterval(revive, 1000)
         
         /*
         
