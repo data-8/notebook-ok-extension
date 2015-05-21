@@ -59,6 +59,15 @@ define([
             }
         ]);
         
+        // toggle specified CSS attribute between two options
+        function toggle(list, attr, option1, option2) {
+            var option = window.simple ? option1 : option2;
+            for (var i in list) {
+                item = list[i];
+                $(item).css(attr, option);
+            }
+        }
+        
         /*
                 
         Simple Mode Setup
@@ -73,30 +82,44 @@ define([
             select_cell($('.cell:first-child'));
         }
         
-        // freeze and empty shortcut objects
+        /*
+        
+        Shortcut Objects Handling
+        
+        - save objects to a global variable
+        - restore objects from global variable
+        
+        */
+        
+        kbd = IPython.keyboard_manager;
+        cmd = kbd.command_shortcuts;
+        edt = kbd.edit_shortcuts;
+        
         function remove_command_mode() {
-            console.log('Simple Mode: Command mode deactivated.');
-            kbd = IPython.keyboard_manager;
-            cmd = kbd.command_shortcuts;
-            edt = kbd.edit_shortcuts;
             freeze_object('commands', cmd);
             freeze_object('edits', edt);
-            console.log(edt.get_shortcut('shift-enter'));
             cmd.clear_shortcuts();
             edt.clear_shortcuts();
+            add_simple_shortcuts();
         }
         
-        // restore shortcut objects from save
         function restore_command_mode() {
-            console.log('Simple Mode: Command mode restored.')
-            kbd = IPython.keyboard_manager;
-            cmd = kbd.command_shortcuts;
-            edt = kbd.edit_shortcuts;
             restore_object('commands', cmd);
             restore_object('edits', edt)
         }
         
-        // freeze objects
+        function add_simple_shortcuts() {
+            edt.add_shortcut('shift-enter', function() {
+                if (window.modal) {
+                    run($('.modal_cell'));
+                } else {
+                    $('.code_cell').each(function() {
+                        run(this);
+                    });
+                }
+            });
+        }
+        
         function freeze_object(variable, obj) {
             window[variable] = {};
             for (var key in obj) {
@@ -105,64 +128,12 @@ define([
                 }
             }
         }
-        
-        // restore objects
+
         function restore_object(variable, obj) {
             for (var key in window[variable]) {
                 obj[key] = window[variable][key];
             }
         }
-        
-        // toggle specified CSS attribute between two options, based on Simple Mode for a list
-        function toggle(list, attr, option1, option2) {
-            var option = window.simple ? option1 : option2;
-            for (var i in list) {
-                item = list[i];
-                $(item).css(attr, option);
-            }
-        }
-        
-        /*
-        
-        Custom Commands
-        
-        - run only if global simple mode is turned on
-        
-        Ref: http://www.sitepoint.com/jquery-capture-multiple-key-press-combinations/
-        
-        */
-             
-        var shortcuts = [
-            {
-                // Run all cells on shift-enter if modal not selected
-                key: 13,
-                func: function() {
-                    if (window.modal) {
-                        run($('.modal_cell'));
-                    } else {
-                        $('.code_cell').each(function() {
-                            run(this);
-                        });
-                    }
-                }
-            }
-        ];
-
-        var shift = 16;
-        var shifted = false;
-        
-        $(document).keyup(function(e) {
-            if (e.which == shift) shifted = false;
-        }).keydown(function(e) {
-            if (e.which == shift) shifted = true;
-            if (shifted == true && window.simple) {
-                jQuery.each(shortcuts, function(i) {
-                    if (shortcuts[i].key == e.which) {
-                        shortcuts[i].func(e);
-                    }
-                });
-            }
-        });
         
         /*
         
@@ -208,6 +179,7 @@ define([
         */
         
         function initialize_simple_modal() {
+            window.modal = false;
             add_modal();
             
         }
