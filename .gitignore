@@ -37,6 +37,7 @@ pip-delete-this-directory.txt
 htmlcov/
 .tox/
 .coverage
+<<<<<<< HEAD
 .coverage.*
 .cache
 nosetests.xml
@@ -55,3 +56,11 @@ docs/_build/
 
 # PyBuilder
 target/
+=======
+.idea/*
+*.ipynb
+*.iml
+src
+env
+.eggs
+>>>>>>> 66ebdbd... gitignore update
