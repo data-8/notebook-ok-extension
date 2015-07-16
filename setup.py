@@ -65,9 +65,11 @@ pjoin = os.path.join
 
 setup_args = dict(
     name = 'jupyter-notebook-student',
-    packages = ['jupyter-notebook-student'],
     description = """An extension of the Jupyter Notebook for UC Berkeley's Data Science 10 course.""",
-    version         = '0.1.0',
+    version         = '0.1.1',
+    scripts         = glob(pjoin('scripts', '*')),
+    packages        = find_packages(),
+    package_data    = find_package_data(),
     author          = 'Alvin Wan',
     author_email    = 'alvinwan@berkeley.edu',
     url             = 'https://github.com/alvinwan/jupyter_notebook',
