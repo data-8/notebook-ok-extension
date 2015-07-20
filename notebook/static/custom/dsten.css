@@ -9,7 +9,7 @@ Course: dsten.github.io
 @author: Alvin Wan
 @site: alvinwan.com
 */
-.simple_text,.button,.code_cell:nth-child(2) {
+.simple_text,.button,.simple-mode-cell {
     transition:         0.2s ease;
     -webkit-transition: 0.2s ease;
     -moz-transition:    0.2s ease;
@@ -23,7 +23,7 @@ Course: dsten.github.io
 #notebook-container .cell {
     border:none;
 }
-#notebook-container .code_cell:nth-child(2) {
+#notebook-container .simple-mode-cell {
     position:fixed;
     bottom:-50%;
     right:5px;

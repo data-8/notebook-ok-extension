@@ -36,7 +36,9 @@ define([
 		icon: fortawesome.github.io/Font-Awesome/icons
 
 		*/
-
+		
+		SIMPLE_CELL_CLASS = 'simple-mode-cell';
+		
 		IPython.toolbar.add_buttons_group([{
 			'label': 'Simple Mode Toggle',
 			'icon': 'fa-square-o',
@@ -62,6 +64,9 @@ define([
 						'.btn-group .navbar-text'
 					],
 					'display', 'none', 'inline-block');
+				toggle([
+					'.btn-group[id="ok_tests"]'
+				], 'display', 'inline-block', 'none');
 			}
 		}]);
 
@@ -87,6 +92,62 @@ define([
 			$('.fa-square-o').html('	Simple mode <b>on</b>').click()
 				.parents('.btn-group').css('float', 'right');
 			select_cell($('.cell:first-child'));
+		}
+		
+		function pick_cell() {
+			if ($('.'+SIMPLE_CELL_CLASS).length == 0) {
+				selector = '.code_cell:last-of-type';
+				candidate = $(selector);
+				if (is_empty(candidate)) {
+					console.log('[Simple Mode] Cell empty. Selecting last cell.');
+					candidate.addClass(SIMPLE_CELL_CLASS);
+				} else {
+					console.log('[Simple Mode] Cell not empty. Adding new cell.');
+					select_cell($('.cell:last-child'));
+					$('#insert_cell_below').click();
+					selector = '.code_cell:last-of-type';
+					candidate = $(selector);
+					pick_cell();
+				}
+			}
+		}
+		
+		// TODO: a code cell with one character is "empty", according to this but empty has length of 1 0.o
+		function is_empty(code_cell) {
+			container = code_cell.find('.CodeMirror-code').children('pre').children('span');
+			return container.contents('span').length == 1 && $(container.children('span')[0]).html().length <= 1;
+		}
+		
+		/*
+
+		Ok Test Button
+
+		- adds a button to the notebook toolbar
+		- prompts user for and stores path to ok client binary
+		- invokes `python3 ok --extension notebook`
+
+		*/
+
+		IPython.toolbar.add_buttons_group([{
+			'label': 'Run ok tests',
+			'icon': 'fa-user-secret',
+			'callback': function() {
+				var button = $(this).children('i');
+
+			}
+		}]);
+		
+		/*
+
+		OK Test Setup
+
+		- add a label to the OK Button
+
+		*/
+
+		function initialize_ok_tests() {
+			$('.fa-user-secret').html('	   Run ok tests')
+				.parents('.btn-group').css('float', 'right').attr('id', 'ok_tests');
 		}
 
 		/*
@@ -191,19 +252,24 @@ define([
 		}
 
 		window.toggle_simple_modal = function() {
-			$('.code_cell:nth-child(2)').toggleClass('show');
+			pick_cell();
+			$('.'+SIMPLE_CELL_CLASS).toggleClass('show');
 			$('.simple_modal').toggleClass('show');
-			window.modal = $('.code_cell:nth-child(2)').hasClass('show');
+			window.modal = $('.'+SIMPLE_CELL_CLASS).hasClass('show');
 			$('.simple_modal .button').html(window.modal ? 'Deactivate' : 'Activate');
 		}
 
-		// basic initializers
-
-		initialize_simple_mode();
-		initialize_simple_modal();
-
 		$(document).ready(function() {
-			$('head').append('<link href="/custom/dsten.css" rel="stylesheet" id="simple_mode">');
+			
+			// JS initializers
+			
+			initialize_simple_mode();
+			initialize_simple_modal();
+			initialize_ok_tests();
+			
+			// DOM initializers
+			
+			$('head').append('<link href="/static/custom/dsten.css" rel="stylesheet" id="simple_mode">');
 			$('#notebook').append('<div class="simple_modal"><div class="simple_text"><h3>Scratch Cell</h3>' + '<p>"Scratch" offers a small sandbox environment, independent of your IPython notebook. ' + 'Shift+Enter with the Scratch Cell open to run it.</div><div class="button" ' + 'onclick="toggle_simple_modal()">Activate</div></div>');
 		});
 
