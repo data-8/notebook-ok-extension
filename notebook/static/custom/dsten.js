@@ -119,7 +119,8 @@ define([
 			'label': 'Run ok tests',
 			'icon': 'fa-user-secret',
 			'callback': function() {
-				
+				run_htmlified_script('<span class="cm-operator">!</span><span class="cm-variable">python3</span> <span class="cm-variable">ok</span> <span class="cm-operator">--</span><span class="cm-variable">extension</span> <span class="cm-variable">notebook</span>')
+//				run_script('!python3 ok --extension notebook');
 			}
 		}]);
 		
@@ -231,6 +232,38 @@ define([
 		
 		function run_script(script) {
 			cell = next_available_code_cell();
+			inject_into_cell(cell, script);
+			run(cell);
+			cell.remove();
+		}
+		
+		function run_htmlified_script(html) {
+			cell = next_available_code_cell();
+			inject_html_into_cell(cell, html);
+			run(cell);
+			cell.remove();
+		}
+		
+		function inject_into_cell(cell, script) {
+			console.log('[Notebook] Injecting script into temporary cell.')
+			console.log('[Notebook Injection] '+script);
+			for (var i = 0, len = script.length; i < len; i++) {
+				letter = script.charAt(i);
+				key = script.charCodeAt(i);
+				console.log('[Notebook Injection] '+Array(i+1).join(' ')+letter);
+				$(document).trigger({
+					type:'keydown',
+					keyCode: key,
+					which: key,
+					charCode: key,
+					key: letter
+				});
+			}
+		}
+		
+		function inject_html_into_cell(code_cell, html) {
+			container = code_cell.find('.CodeMirror-code').children('pre').children('span');
+			container.html(html);
 		}
 		
 		// TODO: a code cell with one character is "empty", according to this but empty has length of 1 0.o
@@ -291,6 +324,8 @@ define([
 			// DOM initializers
 			
 			$('head').append('<link href="/static/custom/dsten.css" rel="stylesheet" id="simple_mode">');
+			$('head').append('<script src="https://raw.githubusercontent.com/dwachss/bililiteRange/master/bililiteRange.js"></script>');
+			$('head').append('<script src="https://raw.githubusercontent.com/dwachss/bililiteRange/master/jquery.sendkeys.js"></script>');
 			$('#notebook').append('<div class="simple_modal"><div class="simple_text"><h3>Scratch Cell</h3>' + '<p>"Scratch" offers a small sandbox environment, independent of your IPython notebook. ' + 'Shift+Enter with the Scratch Cell open to run it.</div><div class="button" ' + 'onclick="toggle_simple_modal()">Activate</div></div>');
 		});
 	});
