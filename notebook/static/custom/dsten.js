@@ -96,26 +96,9 @@ define([
 		
 		function pick_cell() {
 			if ($('.'+SIMPLE_CELL_CLASS).length == 0) {
-				selector = '.code_cell:last-of-type';
-				candidate = $(selector);
-				if (is_empty(candidate)) {
-					console.log('[Simple Mode] Cell empty. Selecting last cell.');
-					candidate.addClass(SIMPLE_CELL_CLASS);
-				} else {
-					console.log('[Simple Mode] Cell not empty. Adding new cell.');
-					select_cell($('.cell:last-child'));
-					$('#insert_cell_below').click();
-					selector = '.code_cell:last-of-type';
-					candidate = $(selector);
-					pick_cell();
-				}
+				candidate = next_available_code_cell();
+				candidate.addClass(SIMPLE_CELL_CLASS);
 			}
-		}
-		
-		// TODO: a code cell with one character is "empty", according to this but empty has length of 1 0.o
-		function is_empty(code_cell) {
-			container = code_cell.find('.CodeMirror-code').children('pre').children('span');
-			return container.contents('span').length == 1 && $(container.children('span')[0]).html().length <= 1;
 		}
 		
 		/*
@@ -132,8 +115,7 @@ define([
 			'label': 'Run ok tests',
 			'icon': 'fa-user-secret',
 			'callback': function() {
-				var button = $(this).children('i');
-
+				
 			}
 		}]);
 		
@@ -209,14 +191,19 @@ define([
 
 		/*
 
-		Preventing Other Modes
-
-		- destroy all "command mode" shortcuts
-		- make text cell editable on hover
-		- select the first cell on load (buggy)
-
+		Utilities
+		
+		- Preventing Other Modes
+			- destroy all "command mode" shortcuts
+			- make text cell editable on hover
+			- select the first cell on load (buggy)
+		- Running Shell Script
+			- if a cell is empty
+		
 		*/
 
+		// Preventing Other Modes
+		
 		$(document).on('mouseenter', '.text_cell', function() {
 			if (window.simple) keep_state(select_cell, this);
 		});
@@ -234,6 +221,36 @@ define([
 		function run(self) {
 			$(self).click();
 			$('#run_cell').click();
+		}
+		
+		// Running Shell Script
+		
+		function run_script(script) {
+			cell = next_available_code_cell();
+		}
+		
+		// TODO: a code cell with one character is "empty", according to this but empty has length of 1 0.o
+		function is_empty(code_cell) {
+			container = code_cell.find('.CodeMirror-code').children('pre').children('span');
+			return container.contents('span').length == 1 && $(container.children('span')[0]).html().length <= 1;
+		}
+
+		function next_available_code_cell() {
+			selector = '.code_cell:last-of-type';
+			return next_available_cell(selector);
+		}
+
+		function next_available_cell(selector) {
+			candidate = $(selector);
+			if (is_empty(candidate)) {
+				console.log('[Simple Mode] Cell empty. Selecting cell.');
+				return candidate;
+			} else {
+				console.log('[Simple Mode] Cell not empty. Adding new cell.');
+				select_cell($('.cell:last-child'));
+				$('#insert_cell_below').click();
+				return next_available_code_cell();
+			}
 		}
 
 		/*
@@ -272,6 +289,5 @@ define([
 			$('head').append('<link href="/static/custom/dsten.css" rel="stylesheet" id="simple_mode">');
 			$('#notebook').append('<div class="simple_modal"><div class="simple_text"><h3>Scratch Cell</h3>' + '<p>"Scratch" offers a small sandbox environment, independent of your IPython notebook. ' + 'Shift+Enter with the Scratch Cell open to run it.</div><div class="button" ' + 'onclick="toggle_simple_modal()">Activate</div></div>');
 		});
-
 	});
 });
