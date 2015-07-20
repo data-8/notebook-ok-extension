@@ -101,6 +101,10 @@ define([
 			}
 		}
 		
+		function unpick_cell() {
+			$('.'+SIMPLE_CELL_CLASS).remove();
+		}
+		
 		/*
 
 		Ok Test Button
@@ -269,7 +273,7 @@ define([
 		}
 
 		window.toggle_simple_modal = function() {
-			pick_cell();
+			if ($('.'+SIMPLE_CELL_CLASS).length > 0) unpick_cell(); else pick_cell();
 			$('.'+SIMPLE_CELL_CLASS).toggleClass('show');
 			$('.simple_modal').toggleClass('show');
 			window.modal = $('.'+SIMPLE_CELL_CLASS).hasClass('show');
