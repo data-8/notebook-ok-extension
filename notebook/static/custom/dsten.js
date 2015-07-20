@@ -65,7 +65,9 @@ define([
 					],
 					'display', 'none', 'inline-block');
 				toggle([
-					'.btn-group[id="ok_tests"]'
+					'.btn-group[id="ok_tests"]',
+					'.'+SIMPLE_CELL_CLASS,
+					'.simple_modal'
 				], 'display', 'inline-block', 'none');
 			}
 		}]);
@@ -307,9 +309,9 @@ define([
 
 		window.toggle_simple_modal = function() {
 			if ($('.'+SIMPLE_CELL_CLASS).length > 0) unpick_cell(); else pick_cell();
-			$('.'+SIMPLE_CELL_CLASS).toggleClass('show');
-			$('.simple_modal').toggleClass('show');
-			window.modal = $('.'+SIMPLE_CELL_CLASS).hasClass('show');
+			$('.'+SIMPLE_CELL_CLASS).toggleClass('shown');
+			$('.simple_modal').toggleClass('shown');
+			window.modal = $('.'+SIMPLE_CELL_CLASS).hasClass('shown');
 			$('.simple_modal .button').html(window.modal ? 'Deactivate' : 'Activate');
 		}
 

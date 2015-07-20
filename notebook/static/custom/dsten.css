@@ -41,7 +41,7 @@ Course: dsten.github.io
     -webkit-box-shadow: 0 0 12px 1px rgba(87,87,87,.2);
     box-shadow: 0 0 12px 1px rgba(87,87,87,.2);
 }
-#notebook-container .code_cell.show {
+#notebook-container .code_cell.shown {
     bottom:125px;
 }
 .simple_modal {
@@ -71,7 +71,7 @@ Course: dsten.github.io
         .simple_text p {
             color:#666;
         }
-        .show .simple_text {
+        .shown .simple_text {
             height:0;
             margin-bottom:0;
         }
@@ -89,9 +89,9 @@ Course: dsten.github.io
 .simple_modal .button:hover {
     background-color:#266AB5;
 }
-.simple_modal.show {
+.simple_modal.shown {
     background-color:#eee;
 }
-    .simple_modal.show .button {
+    .simple_modal.shown .button {
         background-color:#666
     }
