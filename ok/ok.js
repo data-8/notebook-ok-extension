@@ -58,7 +58,7 @@ define([
 		*/
 
 		function initialize_no_edit_mode() {
-			$('.fa-square-o').html('	Edit mode <b>off</b>')
+			$('.fa-square-o').html('	Edit mode <b>off</b>').click().click()
 				.parents('.btn-group').css('float', 'right');
 			select_cell($('.cell:first-child'));
 		}
@@ -168,7 +168,9 @@ define([
 					'.input_prompt',
 					'.prompt',
 					'.out_prompt_overlay',
+					'.dropdown:nth-child(1)',
 					'.dropdown:nth-child(2)',
+					'.dropdown:nth-child(3)',
 					'.dropdown:nth-child(4)',
 					'.dropdown:nth-child(5)',
 					'.btn-group[id="insert_above_below"]',
