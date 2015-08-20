@@ -65,7 +65,7 @@ pjoin = os.path.join
 
 setup_args = dict(
     name = 'jupyter-notebook-student',
-    description = """An extension of the Jupyter Notebook for UC Berkeley's Data Science 10 course.""",
+    description = """An extension of the Jupyter Notebook that integrates testing with OK client.""",
     version         = '0.1.1',
     scripts         = glob(pjoin('scripts', '*')),
     packages        = find_packages(),
