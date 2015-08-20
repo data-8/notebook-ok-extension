@@ -8,7 +8,7 @@ except:
     pip.main(['install', 'jupyter-pip'])
     cmdclass = importlib.import_module('jupyterpip').cmdclass
 
-VERSION = '0.1.0'
+VERSION = '0.1.1'
 
 setup(
     name                = 'notebook-ok-extension',
