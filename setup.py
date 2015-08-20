@@ -1,5 +1,4 @@
 """Setup script for Notebook Ok Extension"""
-
 from setuptools import setup
 
 try:
@@ -9,24 +8,19 @@ except:
     pip.main(['install', 'jupyter-pip'])
     cmdclass = importlib.import_module('jupyterpip').cmdclass
 
-install_requires = [
-    'jupyter-pip'
-]
-
-EXT_NAME = 'notebook-ok-extension'
 VERSION = '0.1.0'
 
 setup(
-    name                = EXT_NAME,
-    packages            = [EXT_NAME],
+    name                = 'notebook-ok-extension',
+    packages            = ['ok'],
     version             = VERSION,
-    install_requires    = install_requires,
+    install_requires    = ['jupyter-pip'],
     description         = """An extension of the Jupyter Notebook that integrates testing with OK client.""",
-    cmdclass            = cmdclass(EXT_NAME, '{}/ok'.format(EXT_NAME)),
+    cmdclass            = cmdclass('ok', 'ok/ok'),
     author              = 'Alvin Wan',
     author_email        = 'hi@alvinwan.com',
     url                 = 'https://github.com/dsten/notebook-ok-extension',
     download_url        = 'https://github.com/dsten/notebook-ok-extension/archive/%s.zip' % VERSION,
     keywords            = ['data', 'tools', 'berkeley'],
-    classifiers         = []
+    classifiers         = ['Programming Language :: Python']
 )

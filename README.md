@@ -14,3 +14,17 @@ When *Edit* is toggled off (default):
 - Cell editing is modeless; cells can be edited, but there is no command mode.
 - A *scratch* cell is available in a separate sandboxed environment.
 - The *Run Tests* button executes the `ok` client on the notebook contents.
+
+## Installation
+
+Install via pip.
+
+```
+pip install notebook-ok-extension
+```
+
+Install.
+
+```
+python setup.py install
+```
