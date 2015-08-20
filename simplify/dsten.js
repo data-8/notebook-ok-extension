@@ -21,10 +21,9 @@ Simple Mode contains the following modifications:
 @site: alvinwan.com
 */
 define([
-	'base/js/namespace',
-	'base/js/events'
-], function(IPython, events) {
-	events.on('app_initialized.NotebookApp', function() {
+	'base/js/namespace'
+], function(IPython) {
+	function _on_load() {
 
 		/*
 
@@ -289,5 +288,7 @@ define([
 			$('head').append('<script src="https://raw.githubusercontent.com/dwachss/bililiteRange/master/jquery.sendkeys.js"></script>');
 			$('#notebook').append('<div class="simple_modal"><div class="simple_text"><h3>Scratch Cell</h3>' + '<p>"Scratch" offers a small sandbox environment, independent of your IPython notebook. ' + 'Shift+Enter with the Scratch Cell open to run it.</div><div class="button" ' + 'onclick="toggle_simple_modal()">Activate</div></div>');
 		});
-	});
+	}
+	
+	return {load_ipython_extension: _on_load}
 });
