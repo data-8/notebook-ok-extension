@@ -35,26 +35,7 @@ define([
 				} else {
 					restore_command_mode();
 				}
-				toggle([
-						'.input_prompt',
-						'.prompt',
-						'.out_prompt_overlay',
-						'.dropdown:nth-child(2)',
-						'.dropdown:nth-child(4)',
-						'.dropdown:nth-child(5)',
-						'.btn-group[id="insert_above_below"]',
-						'.btn-group[id="cut_copy_paste"]',
-						'.btn-group[id="move_up_down"]',
-						'.btn-group[id="run_int"] .btn:first-child',
-						'.form-control',
-						'.btn-group .navbar-text'
-					],
-					'display', 'none', 'inline-block');
-				toggle([
-					'.btn-group[id="ok_tests"]',
-					'.'+EDIT_CELL_CLASS,
-					'.edit_modal'
-				], 'display', 'inline-block', 'none');
+				toggle_edit_ui();
 			}
 		}]);
 
@@ -182,6 +163,28 @@ define([
 			}
 		}
 
+		function toggle_edit_ui() {
+			toggle([
+					'.input_prompt',
+					'.prompt',
+					'.out_prompt_overlay',
+					'.dropdown:nth-child(2)',
+					'.dropdown:nth-child(4)',
+					'.dropdown:nth-child(5)',
+					'.btn-group[id="insert_above_below"]',
+					'.btn-group[id="cut_copy_paste"]',
+					'.btn-group[id="move_up_down"]',
+					'.btn-group[id="run_int"] .btn:first-child',
+					'.form-control',
+					'.btn-group .navbar-text'
+				],
+				'display', 'none', 'inline-block');
+			toggle([
+				'.btn-group[id="ok_tests"]',
+				'.'+EDIT_CELL_CLASS,
+				'.edit_modal'
+			], 'display', 'inline-block', 'none');
+		}
 		/*
 
 		Utilities
@@ -258,7 +261,7 @@ define([
 			$('.'+EDIT_CELL_CLASS).toggleClass('shown');
 			$('.edit_modal').toggleClass('shown');
 			window.modal = $('.'+EDIT_CELL_CLASS).hasClass('shown');
-			$('.edit_modal .button').html(window.modal ? 'Deactivate' : 'Activate');
+			$('.edit_modal .button').html(window.modal ? 'Deactivate' : 'Scratch');
 		}
 
 		$(document).ready(function() {
@@ -274,7 +277,7 @@ define([
 			$('head').append('<link href="/nbextensions/ok/ok.css" rel="stylesheet" id="no_edit_mode">');
 			$('head').append('<script src="https://rawgit.com/dwachss/bililiteRange/master/bililiteRange.js"></script>');
 			$('head').append('<script src="https://rawgit.com/dwachss/bililiteRange/master/jquery.sendkeys.js"></script>');
-			$('#notebook').append('<div class="edit_modal"><div class="edit_text"><h3>Scratch Cell</h3>' + '<p>"Scratch" offers a small sandbox environment, independent of your IPython notebook. ' + 'Shift+Enter with the Scratch Cell open to run it.</div><div class="button" ' + 'onclick="toggle_edit_modal()">Activate</div></div>');
+			$('#notebook').append('<div class="edit_modal"><div class="edit_text"></div><div class="button" ' + 'onclick="toggle_edit_modal()">Scratch</div></div>');
 		});
 	}
 

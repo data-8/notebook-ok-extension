@@ -5,10 +5,7 @@ Integration of OK.
 @site: alvinwan.com
 */
 .edit_text,.button,.edit-mode-cell {
-    transition:         0.2s ease;
-    -webkit-transition: 0.2s ease;
-    -moz-transition:    0.2s ease;
-    -o-transition:      0.2s ease;
+
 }
 .prompt, .input_prompt,body div.out_prompt_overlay.prompt {
     display:none;
@@ -21,11 +18,11 @@ Integration of OK.
     position:fixed;
     bottom:-50%;
     right:5px;
-    width:300px;
+    width:240px;
     border:none;
     z-index:20;
     background-color:#FFF;
-    padding:30px;
+    padding:20px;
     margin-right:5px;
     max-height:50%;
     overflow-y:scroll;
@@ -36,16 +33,16 @@ Integration of OK.
     box-shadow: 0 0 12px 1px rgba(87,87,87,.2);
 }
 #notebook-container .code_cell.shown {
-    bottom:125px;
+    bottom:85px;
 }
 .edit_modal {
     position:fixed;
-    width:300px;
+    width:240px;
     bottom:0;
     right:0;
     margin:10px;
     background-color:#FFF;
-    padding:30px;
+    padding:20px;
     z-index:10;
     border-radius:3px;
 
@@ -57,7 +54,6 @@ Integration of OK.
     box-sizing:border-box;
     -moz-box-sizing:border-box;
     overflow:hidden;
-    margin: -5px 0 25px 0;
 }
 .edit_text h3 {
     color:#333;
@@ -72,7 +68,7 @@ Integration of OK.
 .edit_modal .button {
     background-color:#2f83e0;
     color:#FFF;
-    line-height:60px;
+    line-height:40px;
     text-align:center;
     cursor:pointer;
     text-transform:uppercase;
