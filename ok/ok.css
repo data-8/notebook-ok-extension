@@ -10,7 +10,6 @@ Integration of OK.
     -moz-transition:    0.2s ease;
     -o-transition:      0.2s ease;
 }
-
 .prompt, .input_prompt,body div.out_prompt_overlay.prompt {
     display:none;
     z-index:-1;
@@ -60,16 +59,16 @@ Integration of OK.
     overflow:hidden;
     margin: -5px 0 25px 0;
 }
-    .edit_text h3 {
-        color:#333;
-    }
-    .edit_text p {
-        color:#666;
-    }
-    .shown .edit_text {
-        height:0;
-        margin-bottom:0;
-    }
+.edit_text h3 {
+    color:#333;
+}
+.edit_text p {
+    color:#666;
+}
+.shown .edit_text {
+    height:0;
+    margin-bottom:0;
+}
 .edit_modal .button {
     background-color:#2f83e0;
     color:#FFF;
