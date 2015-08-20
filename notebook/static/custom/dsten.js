@@ -209,16 +209,6 @@ define([
 		*/
 
 		// Preventing Other Modes
-		
-		$(document).on('mouseenter', '.text_cell', function() {
-			if (window.simple) keep_state(select_cell, this);
-		});
-
-		function keep_state(func, arg) {
-			var cell = $('.selected');
-			func(arg);
-			select_cell(cell);
-		}
 
 		function select_cell(self) {
 			$(self).click().dblclick();
