@@ -35,9 +35,9 @@ define([
 		icon: fortawesome.github.io/Font-Awesome/icons
 
 		*/
-		
+
 		SIMPLE_CELL_CLASS = 'simple-mode-cell';
-		
+
 		IPython.toolbar.add_buttons_group([{
 			'label': 'Simple Mode Toggle',
 			'icon': 'fa-square-o',
@@ -94,18 +94,18 @@ define([
 				.parents('.btn-group').css('float', 'right');
 			select_cell($('.cell:first-child'));
 		}
-		
+
 		function pick_cell() {
 			if ($('.'+SIMPLE_CELL_CLASS).length == 0) {
 				candidate = next_available_code_cell();
 				candidate.addClass(SIMPLE_CELL_CLASS);
 			}
 		}
-		
+
 		function unpick_cell() {
 			$('.'+SIMPLE_CELL_CLASS).remove();
 		}
-		
+
 		/*
 
 		Ok Test Button
@@ -120,10 +120,11 @@ define([
 			'label': 'Run ok tests',
 			'icon': 'fa-user-secret',
 			'callback': function() {
-				run_script("import subprocess\nsubprocess.call(['python3', 'ok', '--extension', 'notebook'])");
+				run_script("import subprocess\nsubprocess.call(['python3', 'ok', '--extension', 'notebook'], env=os.environ.copy())");
+				location.reload();
 			}
 		}]);
-		
+
 		/*
 
 		OK Test Setup
@@ -197,14 +198,14 @@ define([
 		/*
 
 		Utilities
-		
+
 		- Preventing Other Modes
 			- destroy all "command mode" shortcuts
 			- make text cell editable on hover
 			- select the first cell on load (buggy)
 		- Running Shell Script
 			- if a cell is empty
-		
+
 		*/
 
 		// Preventing Other Modes
@@ -217,15 +218,15 @@ define([
 			$(self).click();
 			$('#run_cell').click();
 		}
-		
+
 		// Running Shell Script
-		
+
 		function run_script(script) {
 			console.log('[Notebook] executing: '+script);
 			var kernel = IPython.notebook.kernel;
             kernel.execute(script);
 		}
-		
+
 		// TODO: a code cell with one character is "empty", according to this but empty has length of 1 0.o
 		function is_empty(code_cell) {
 			container = code_cell.find('.CodeMirror-code').children('pre').children('span');
@@ -274,21 +275,21 @@ define([
 		}
 
 		$(document).ready(function() {
-			
+
 			// JS initializers
-			
+
 			initialize_simple_mode();
 			initialize_simple_modal();
 			initialize_ok_tests();
-			
+
 			// DOM initializers
-			
-			$('head').append('<link href="/static/custom/dsten.css" rel="stylesheet" id="simple_mode">');
+
+			$('head').append('<link href="/nbextensions/ok/ok.css" rel="stylesheet" id="simple_mode">');
 			$('head').append('<script src="https://raw.githubusercontent.com/dwachss/bililiteRange/master/bililiteRange.js"></script>');
 			$('head').append('<script src="https://raw.githubusercontent.com/dwachss/bililiteRange/master/jquery.sendkeys.js"></script>');
 			$('#notebook').append('<div class="simple_modal"><div class="simple_text"><h3>Scratch Cell</h3>' + '<p>"Scratch" offers a small sandbox environment, independent of your IPython notebook. ' + 'Shift+Enter with the Scratch Cell open to run it.</div><div class="button" ' + 'onclick="toggle_simple_modal()">Activate</div></div>');
 		});
 	}
-	
+
 	return {load_ipython_extension: _on_load}
 });
