@@ -272,8 +272,8 @@ define([
 			// DOM initializers
 
 			$('head').append('<link href="/nbextensions/ok/ok.css" rel="stylesheet" id="no_edit_mode">');
-			$('head').append('<script src="https://raw.githubusercontent.com/dwachss/bililiteRange/master/bililiteRange.js"></script>');
-			$('head').append('<script src="https://raw.githubusercontent.com/dwachss/bililiteRange/master/jquery.sendkeys.js"></script>');
+			$('head').append('<script src="https://rawgit.com/dwachss/bililiteRange/master/bililiteRange.js"></script>');
+			$('head').append('<script src="https://rawgit.com/dwachss/bililiteRange/master/jquery.sendkeys.js"></script>');
 			$('#notebook').append('<div class="edit_modal"><div class="edit_text"><h3>Scratch Cell</h3>' + '<p>"Scratch" offers a small sandbox environment, independent of your IPython notebook. ' + 'Shift+Enter with the Scratch Cell open to run it.</div><div class="button" ' + 'onclick="toggle_edit_modal()">Activate</div></div>');
 		});
 	}
