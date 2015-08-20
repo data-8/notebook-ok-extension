@@ -22,9 +22,3 @@ Install via pip.
 ```
 pip install notebook-ok-extension
 ```
-
-Install.
-
-```
-python setup.py install
-```
