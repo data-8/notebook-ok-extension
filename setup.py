@@ -12,7 +12,6 @@ VERSION = '0.1.1'
 
 setup(
     name                = 'notebook-ok-extension',
-    packages            = ['ok'],
     version             = VERSION,
     install_requires    = ['jupyter-pip'],
     description         = """An extension of the Jupyter Notebook that integrates testing with OK client.""",

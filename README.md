@@ -22,3 +22,9 @@ Install via pip.
 ```
 pip install notebook-ok-extension
 ```
+
+Separately, install a version of `okpy` via pip.
+
+```
+pip install okpy
+```
