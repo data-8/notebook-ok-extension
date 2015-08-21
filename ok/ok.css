@@ -1,21 +1,12 @@
 /*
-
-Customized for Data Science 10
-course created and taught by Professor John DeNero
-
-Professor: denero.org
-Course: dsten.github.io
+Integration of OK.
 
 @author: Alvin Wan
 @site: alvinwan.com
 */
-.simple_text,.button,.simple-mode-cell {
-    transition:         0.2s ease;
-    -webkit-transition: 0.2s ease;
-    -moz-transition:    0.2s ease;
-    -o-transition:      0.2s ease;
-}
+.edit_text,.button,.edit_mode_cell {
 
+}
 .prompt, .input_prompt,body div.out_prompt_overlay.prompt {
     display:none;
     z-index:-1;
@@ -23,75 +14,74 @@ Course: dsten.github.io
 #notebook-container .cell {
     border:none;
 }
-#notebook-container .simple-mode-cell {
+#notebook-container .edit_mode_cell {
     position:fixed;
     bottom:-50%;
     right:5px;
-    width:300px;
+    width:240px;
     border:none;
     z-index:20;
     background-color:#FFF;
-    padding:30px;
+    padding:20px;
     margin-right:5px;
     max-height:50%;
     overflow-y:scroll;
     overflow-x:hidden;
-    
+
     /* IPython's default CSS shadow */
     -webkit-box-shadow: 0 0 12px 1px rgba(87,87,87,.2);
     box-shadow: 0 0 12px 1px rgba(87,87,87,.2);
 }
 #notebook-container .code_cell.shown {
-    bottom:125px;
+    bottom:85px;
 }
-.simple_modal {
+.edit_modal {
     position:fixed;
-    width:300px;
+    width:240px;
     bottom:0;
     right:0;
     margin:10px;
     background-color:#FFF;
-    padding:30px;
+    padding:20px;
     z-index:10;
     border-radius:3px;
-    
+
     /* IPython's default CSS shadow */
     -webkit-box-shadow: 0 0 12px 1px rgba(87,87,87,.2);
     box-shadow: 0 0 12px 1px rgba(87,87,87,.2);
 }
-    .simple_text {
-        box-sizing:border-box;
-        -moz-box-sizing:border-box;
-        overflow:hidden;
-        margin: -5px 0 25px 0;
-    }
-        .simple_text h3 {
-            color:#333;
-        }
-        .simple_text p {
-            color:#666;
-        }
-        .shown .simple_text {
-            height:0;
-            margin-bottom:0;
-        }
-    .simple_modal .button {
-        background-color:#2f83e0;
-        color:#FFF;
-        line-height:60px;
-        text-align:center;
-        cursor:pointer;
-        text-transform:uppercase;
-        letter-spacing:2px; 
-        border-radius:3px;
-        font-weight:bold;
-    }
-.simple_modal .button:hover {
+.edit_text {
+    box-sizing:border-box;
+    -moz-box-sizing:border-box;
+    overflow:hidden;
+}
+.edit_text h3 {
+    color:#333;
+}
+.edit_text p {
+    color:#666;
+}
+.shown .edit_text {
+    height:0;
+    margin-bottom:0;
+}
+.edit_modal .button {
+    background-color:#2f83e0;
+    color:#FFF;
+    line-height:40px;
+    text-align:center;
+    cursor:pointer;
+    text-transform:uppercase;
+    letter-spacing:2px;
+    border-radius:3px;
+    font-weight:bold;
+}
+.edit_modal .button:hover {
     background-color:#266AB5;
 }
-.simple_modal.shown {
+.edit_modal.shown {
     background-color:#eee;
 }
-    .simple_modal.shown .button {
-        background-color:#666
-    }
+.edit_modal.shown .button {
+    background-color:#666
+}

@@ -1,21 +1,5 @@
 /*
-
-Customized for Data Science 10
-course created and taught by Professor John DeNero
-
-Professor: denero.org
-Course: dsten.github.io
-
-Toggle on-off "Simple Mode" using the check mark in the toolbar.
-
-Simple Mode contains the following modifications:
-
-1. By default, shift-enter runs all cells.
-2. Only edit mode exists:
-	a. All command mode shortcuts are removed.
-	b. The first code cell is selected upon page load.
-	c. Markdown-formatted cells are automatically editable upon hover.
-3. Small "scratch cell" modal is available for testing code outside of the current file.
+Integration of OK and disabling structural edits.
 
 @author: Alvin Wan
 @site: alvinwan.com
@@ -27,53 +11,38 @@ define([
 
 		/*
 
-		Simple Mode Button
+		Edit Mode Button
 
 		- adds a button to the notebook toolbar
-		- toggles a global simple mode variable
+		- toggles a global edit mode variable
 
 		icon: fortawesome.github.io/Font-Awesome/icons
 
 		*/
 
-		SIMPLE_CELL_CLASS = 'simple-mode-cell';
+		EDIT_CELL_CLASS = 'edit_mode_cell';
 
 		IPython.toolbar.add_buttons_group([{
-			'label': 'Simple Mode Toggle',
+			'label': 'Edit',
 			'icon': 'fa-square-o',
 			'callback': function() {
 				var button = $(this).children('i');
 				button.toggleClass('fa-square-o').toggleClass('fa-check-square-o');
-				window.simple = button.hasClass('fa-check-square-o');
-				button.children('b').html(window.simple ? 'on' : 'off');
-				if (window.simple) remove_command_mode();
-				else restore_command_mode();
-				toggle([
-						'.input_prompt',
-						'.prompt',
-						'.out_prompt_overlay',
-						'.dropdown:nth-child(2)',
-						'.dropdown:nth-child(4)',
-						'.dropdown:nth-child(5)',
-						'.btn-group[id="insert_above_below"]',
-						'.btn-group[id="cut_copy_paste"]',
-						'.btn-group[id="move_up_down"]',
-						'.btn-group[id="run_int"] .btn:first-child',
-						'.form-control',
-						'.btn-group .navbar-text'
-					],
-					'display', 'none', 'inline-block');
-				toggle([
-					'.btn-group[id="ok_tests"]',
-					'.'+SIMPLE_CELL_CLASS,
-					'.simple_modal'
-				], 'display', 'inline-block', 'none');
+				window.no_edit = button.hasClass('fa-square-o');
+				button.children('b').html(window.no_edit ? 'off' : 'on');
+				if (window.no_edit) {
+					remove_command_mode();
+				} else {
+					restore_command_mode();
+				}
+				toggle_edit_ui();
+				window.last_exec = -1;
 			}
 		}]);
 
 		// toggle specified CSS attribute between two options
 		function toggle(list, attr, option1, option2) {
-			var option = window.simple ? option1 : option2;
+			var option = window.no_edit ? option1 : option2;
 			for (var i in list) {
 				item = list[i];
 				$(item).css(attr, option);
@@ -82,28 +51,28 @@ define([
 
 		/*
 
-		Simple Mode Setup
+		Edit Mode Setup
 
-		- add a label to the DS10 Button
+		- add a label to the edit button
 		- select the first cell on load
 
 		*/
 
-		function initialize_simple_mode() {
-			$('.fa-square-o').html('	Simple mode <b>on</b>').click()
+		function initialize_no_edit_mode() {
+			$('.fa-square-o').html('	Edit mode <b>off</b>').click().click()
 				.parents('.btn-group').css('float', 'right');
 			select_cell($('.cell:first-child'));
 		}
 
 		function pick_cell() {
-			if ($('.'+SIMPLE_CELL_CLASS).length == 0) {
+			if ($('.'+EDIT_CELL_CLASS).length == 0) {
 				candidate = next_available_code_cell();
-				candidate.addClass(SIMPLE_CELL_CLASS);
+				candidate.addClass(EDIT_CELL_CLASS);
 			}
 		}
 
 		function unpick_cell() {
-			$('.'+SIMPLE_CELL_CLASS).remove();
+			$('.'+EDIT_CELL_CLASS).remove();
 		}
 
 		/*
@@ -120,8 +89,28 @@ define([
 			'label': 'Run ok tests',
 			'icon': 'fa-user-secret',
 			'callback': function() {
-				run_script("import subprocess\nsubprocess.call(['python3', 'ok', '--extension', 'notebook'], env=os.environ.copy())");
-				location.reload();
+				IPython.notebook.save_checkpoint();
+				var name = IPython.notebook.notebook_name;
+
+				/*
+
+				Export the current notebook as a Python file called submission.py,
+				then execute all "ok" cells
+
+				*/
+				var cmd = '!ipython nbconvert --to python --stdout '
+				cmd += '"' + name + '" | grep -v "^get_ipython" > submission.py',
+				run_script(cmd, function (response) {
+					console.log("Finished exporting");
+					$.each(IPython.notebook.get_cells(),
+						function () {
+							console.log(this);
+							if (this.get_text().startsWith('# ok')) {
+								this.execute()
+							}
+						}
+					)
+				})
 			}
 		}]);
 
@@ -156,28 +145,52 @@ define([
 			freeze_object('edits', edt);
 			cmd.clear_shortcuts();
 			edt.clear_shortcuts();
-			add_simple_shortcuts();
-			$('.simple_modal').show();
-			$('#simple_mode').attr('rel', 'stylesheet');
+			add_edit_shortcuts();
+			$('.edit_modal').show();
+			$('#no_edit_mode').attr('rel', 'stylesheet');
+			$.each(IPython.notebook.get_cells(), function() {
+				var text = this.get_text().toLowerCase();
+				if (text.startsWith("# hidden") || text.startsWith("# ok")) {
+					this.element.find('.input').hide();
+				}
+			});
 		}
 
 		function restore_command_mode() {
 			restore_object('commands', cmd);
 			restore_object('edits', edt);
-			$('.simple_modal').hide();
-			$('#simple_mode').attr('rel', 'simple-mode-deactivated');
+			$('.edit_modal').hide();
+			$('#no_edit_mode').attr('rel', 'edit-mode-deactivated');
+			$('.code_cell:not(.edit_mode_cell)').each(function() {
+				$(this).find('.input').show();
+			});
 		}
 
-		function add_simple_shortcuts() {
+		function add_edit_shortcuts() {
 			edt.add_shortcut('shift-enter', function() {
 				if (window.modal) {
-					run($('.modal_cell'));
+					run($('.edit_mode_cell'));
 				} else {
-					$('.code_cell:not(.modal_cell)').each(function() {
-						run(this);
-					});
+					var cells = $('.code_cell:not(.edit_mode_cell)');
+					var selected = cells.index($('.selected'));
+					var previous = window.last_exec
+					window.last_exec = selected;
+					if (selected < previous) {
+						run_slice(cells, 0, selected);
+					} else {
+						run_slice(cells, previous+1, selected);
+					}
 				}
 			});
+		}
+
+		function run_slice(cells, start, end) {
+			console.log(start, end);
+			cells.slice(start, end).each(function() {
+				console.log(this);
+				run(this);
+			})
+			run(cells[end]);
 		}
 
 		function freeze_object(variable, obj) {
@@ -195,6 +208,32 @@ define([
 			}
 		}
 
+		function toggle_edit_ui() {
+			toggle([
+					'.input_prompt',
+					'.prompt',
+					'.out_prompt_overlay',
+					'.dropdown:nth-child(1)',
+					'.dropdown:nth-child(2)',
+					'.dropdown:nth-child(3)',
+					'.dropdown:nth-child(4)',
+					'.dropdown:nth-child(5)',
+					'.btn-group[id="insert_above_below"]',
+					'.btn-group[id="cut_copy_paste"]',
+					'.btn-group[id="move_up_down"]',
+					'.btn-group[id="run_int"] .btn:nth-child(0)',
+					'.btn-group[id="run_int"] .btn:nth-child(0)',
+					'.btn-group[id="run_int"] .btn:nth-child(2)',
+					'.form-control',
+					'.btn-group .navbar-text'
+				],
+				'display', 'none', 'inline-block');
+			toggle([
+				'.btn-group[id="ok_tests"]',
+				'.'+EDIT_CELL_CLASS,
+				'.edit_modal'
+			], 'display', 'inline-block', 'none');
+		}
 		/*
 
 		Utilities
@@ -221,11 +260,21 @@ define([
 
 		// Running Shell Script
 
-		function run_script(script) {
-			console.log('[Notebook] executing: '+script);
+		function run_script(script, callback) {
+			console.log('[Notebook] executing: ' + script);
 			var kernel = IPython.notebook.kernel;
-            kernel.execute(script);
-		}
+            kernel.execute(script, {
+                shell: {
+                  reply: callback,
+                  payload: {}
+                },
+                iopub : {
+                  output : function () {},
+                  clear_output : function () {},
+                },
+                input : function () {}
+            });
+        }
 
 		// TODO: a code cell with one character is "empty", according to this but empty has length of 1 0.o
 		function is_empty(code_cell) {
@@ -241,10 +290,10 @@ define([
 		function next_available_cell(selector) {
 			candidate = $(selector);
 			if (is_empty(candidate)) {
-				console.log('[Simple Mode] Cell empty. Selecting cell.');
+				console.log('[Edit Mode] Cell empty. Selecting cell.');
 				return candidate;
 			} else {
-				console.log('[Simple Mode] Cell not empty. Adding new cell.');
+				console.log('[Edit Mode] Cell not empty. Adding new cell.');
 				select_cell($('.cell:last-child'));
 				$('#insert_cell_below').click();
 				return next_available_code_cell();
@@ -261,33 +310,33 @@ define([
 
 		*/
 
-		function initialize_simple_modal() {
+		function initialize_edit_modal() {
 			window.modal = false;
 			$('#insert-cell-below').click();
 		}
 
-		window.toggle_simple_modal = function() {
-			if ($('.'+SIMPLE_CELL_CLASS).length > 0) unpick_cell(); else pick_cell();
-			$('.'+SIMPLE_CELL_CLASS).toggleClass('shown');
-			$('.simple_modal').toggleClass('shown');
-			window.modal = $('.'+SIMPLE_CELL_CLASS).hasClass('shown');
-			$('.simple_modal .button').html(window.modal ? 'Deactivate' : 'Activate');
+		window.toggle_edit_modal = function() {
+			if ($('.'+EDIT_CELL_CLASS).length > 0) unpick_cell(); else pick_cell();
+			$('.'+EDIT_CELL_CLASS).toggleClass('shown');
+			$('.edit_modal').toggleClass('shown');
+			window.modal = $('.'+EDIT_CELL_CLASS).hasClass('shown');
+			$('.edit_modal .button').html(window.modal ? 'Deactivate' : 'Scratch');
 		}
 
 		$(document).ready(function() {
 
 			// JS initializers
 
-			initialize_simple_mode();
-			initialize_simple_modal();
+			initialize_no_edit_mode();
+			initialize_edit_modal();
 			initialize_ok_tests();
 
 			// DOM initializers
 
-			$('head').append('<link href="/static/custom/dsten.css" rel="stylesheet" id="simple_mode">');
+			$('head').append('<link href="/nbextensions/ok/ok.css" rel="stylesheet" id="no_edit_mode">');
 			$('head').append('<script src="https://rawgit.com/dwachss/bililiteRange/master/bililiteRange.js"></script>');
 			$('head').append('<script src="https://rawgit.com/dwachss/bililiteRange/master/jquery.sendkeys.js"></script>');
-			$('#notebook').append('<div class="simple_modal"><div class="simple_text"><h3>Scratch Cell</h3>' + '<p>"Scratch" offers a small sandbox environment, independent of your IPython notebook. ' + 'Shift+Enter with the Scratch Cell open to run it.</div><div class="button" ' + 'onclick="toggle_simple_modal()">Activate</div></div>');
+			$('#notebook').append('<div class="edit_modal"><div class="edit_text"></div><div class="button" ' + 'onclick="toggle_edit_modal()">Scratch</div></div>');
 		});
 	}
 
