@@ -54,6 +54,7 @@ define([
 		Edit Mode Setup
 
 		- add a label to the edit button
+		- add change listeners & indices to all input cells
 		- select the first cell on load
 
 		*/
@@ -61,6 +62,16 @@ define([
 		function initialize_no_edit_mode() {
 			$('.fa-square-o').html('	Edit mode <b>off</b>').click().click()
 				.parents('.btn-group').css('float', 'right');
+			var i = 0;
+			$.each(get_normal_cells(), function (index, cell) {
+				cell.normal_cell_index = index;
+				cell.element.find('.input').on('change keyup paste', function (event) {
+					if (window.last_exec > index) {
+						window.last_exec = index - 1;
+						console.log("Updated last_exec: " + window.last_exec);
+					}
+				});
+			});
 			select_cell($('.cell:first-child'));
 		}
 
@@ -165,10 +176,8 @@ define([
 					run($('.edit_mode_cell'));
 				} else {
 					var cells = get_normal_cells();
-					// Index of the selected element
-					var selected = $.map(cells, function(cell, index) {
-					    if(cell.selected) { return index; }
-					})[0];
+					console.log(cells);
+					var selected = $(cells).filter(function(i, c) { return c.selected; })[0].normal_cell_index;
 					if (!isFinite(selected)) {
 						console.log("No selected cell: " + cells);
 						return;
