@@ -89,8 +89,28 @@ define([
 			'label': 'Run ok tests',
 			'icon': 'fa-user-secret',
 			'callback': function() {
-				run_script("import subprocess\nsubprocess.call(['python3', 'ok', '--extension', 'notebook'], env=os.environ.copy())");
-				location.reload();
+				IPython.notebook.save_checkpoint();
+				var name = IPython.notebook.notebook_name;
+
+				/*
+
+				Export the current notebook as a Python file called submission.py,
+				then execute all "ok" cells
+
+				*/
+				var cmd = '!ipython nbconvert --to python --stdout '
+				cmd += '"' + name + '" | grep -v "^get_ipython" > submission.py',
+				run_script(cmd, function (response) {
+					console.log("Finished exporting");
+					$.each(IPython.notebook.get_cells(),
+						function () {
+							console.log(this);
+							if (this.get_text().startsWith('# ok')) {
+								this.execute()
+							}
+						}
+					)
+				})
 			}
 		}]);
 
@@ -128,7 +148,12 @@ define([
 			add_edit_shortcuts();
 			$('.edit_modal').show();
 			$('#no_edit_mode').attr('rel', 'stylesheet');
-			window.last_exec = -1;
+			$.each(IPython.notebook.get_cells(), function() {
+				var text = this.get_text().toLowerCase();
+				if (text.startsWith("# hidden") || text.startsWith("# ok")) {
+					this.element.find('.input').hide();
+				}
+			});
 		}
 
 		function restore_command_mode() {
@@ -136,7 +161,9 @@ define([
 			restore_object('edits', edt);
 			$('.edit_modal').hide();
 			$('#no_edit_mode').attr('rel', 'edit-mode-deactivated');
-			window.last_exec = -1;
+			$('.code_cell:not(.edit_mode_cell)').each(function() {
+				$(this).find('.input').show();
+			});
 		}
 
 		function add_edit_shortcuts() {
@@ -149,7 +176,6 @@ define([
 					var previous = window.last_exec
 					window.last_exec = selected;
 					if (selected < previous) {
-						IPython.notebook.clear_all_output();
 						run_slice(cells, 0, selected);
 					} else {
 						run_slice(cells, previous+1, selected);
@@ -195,7 +221,8 @@ define([
 					'.btn-group[id="insert_above_below"]',
 					'.btn-group[id="cut_copy_paste"]',
 					'.btn-group[id="move_up_down"]',
-					'.btn-group[id="run_int"] .btn:nth-child(1)',
+					'.btn-group[id="run_int"] .btn:nth-child(0)',
+					'.btn-group[id="run_int"] .btn:nth-child(0)',
 					'.btn-group[id="run_int"] .btn:nth-child(2)',
 					'.form-control',
 					'.btn-group .navbar-text'
@@ -233,11 +260,21 @@ define([
 
 		// Running Shell Script
 
-		function run_script(script) {
-			console.log('[Notebook] executing: '+script);
+		function run_script(script, callback) {
+			console.log('[Notebook] executing: ' + script);
 			var kernel = IPython.notebook.kernel;
-            kernel.execute(script);
-		}
+            kernel.execute(script, {
+                shell: {
+                  reply: callback,
+                  payload: {}
+                },
+                iopub : {
+                  output : function () {},
+                  clear_output : function () {},
+                },
+                input : function () {}
+            });
+        }
 
 		// TODO: a code cell with one character is "empty", according to this but empty has length of 1 0.o
 		function is_empty(code_cell) {
