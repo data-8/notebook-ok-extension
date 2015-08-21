@@ -258,8 +258,12 @@ define([
 			$('#run_cell').click();
 		}
 
-		// Running Shell Script
-
+		/*
+		 * Run script, using callback on results of script.
+		 * 
+		 * @param script - command-line command
+		 * @param {function} [callback] - passed to shell reply
+		 */
 		function run_script(script, callback) {
 			console.log('[Notebook] executing: ' + script);
 			var kernel = IPython.notebook.kernel;
@@ -282,11 +286,20 @@ define([
 			return container.contents('span').length == 1 && $(container.children('span')[0]).html().length <= 1;
 		}
 
+		/*
+		 * Grab next available, empty, code cell.
+		 */
 		function next_available_code_cell() {
 			selector = '.code_cell:last-of-type';
 			return next_available_cell(selector);
 		}
 
+		/*
+		 * Grab the next available, empty cell. Insert a new cell if all cells
+		 * are filled.
+		 *
+		 * @param {string} [selector] - attempt to select cell
+		 */
 		function next_available_cell(selector) {
 			candidate = $(selector);
 			if (is_empty(candidate)) {
@@ -294,9 +307,7 @@ define([
 				return candidate;
 			} else {
 				console.log('[Edit Mode] Cell not empty. Adding new cell.');
-				select_cell($('.cell:last-child'));
-				$('#insert_cell_below').click();
-				return next_available_code_cell();
+				IPython.notebook.insert_cell_at_bottom();
 			}
 		}
 
