@@ -1,9 +1,14 @@
 /*
-Integration of OK and disabling structural edits.
-
-@author: Alvin Wan
-@site: alvinwan.com
-*/
+ *
+ * Integration of OK and disabling structural edits.
+ *
+ * @author: Alvin Wan, John DeNero
+ * @site: alvinwan.com, denero.org
+ *
+ */
+ 
+// for notebook API, see:
+// https://github.com/jupyter/notebook/blob/master/notebook/static/notebook/js/notebook.js
 define([
 	'base/js/namespace'
 ], function(IPython) {
@@ -261,8 +266,8 @@ define([
 		/*
 		 * Run script, using callback on results of script.
 		 * 
-		 * @param script - command-line command
-		 * @param {function} [callback] - passed to shell reply
+		 * @param script: command-line command
+		 * @param {function} [callback]: passed to shell reply
 		 */
 		function run_script(script, callback) {
 			console.log('[Notebook] executing: ' + script);
@@ -298,7 +303,7 @@ define([
 		 * Grab the next available, empty cell. Insert a new cell if all cells
 		 * are filled.
 		 *
-		 * @param {string} [selector] - attempt to select cell
+		 * @param {string} [selector]: attempt to select cell
 		 */
 		function next_available_cell(selector) {
 			candidate = $(selector);
