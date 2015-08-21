@@ -177,7 +177,12 @@ define([
 				} else {
 					var cells = get_normal_cells();
 					console.log(cells);
-					var selected = $(cells).filter(function(i, c) { return c.selected; })[0].normal_cell_index;
+					// Index of selected cell
+					var selected = $(cells).map(function(i, c) {
+						if (c.selected) {
+							return i;
+						}
+					})[0];
 					if (!isFinite(selected)) {
 						console.log("No selected cell: " + cells);
 						return;
@@ -194,12 +199,21 @@ define([
 						IPython.notebook.clear_all_output()
 						run_slice(cells, 0, selected);
 					} else if (selected == previous) {
+						clear_below(cells, selected);
 						run_slice(cells, selected, selected);
 					} else {
+						clear_below(cells, selected);
 						run_slice(cells, previous+1, selected);
 					}
 				}
 			});
+		}
+
+		function clear_below(cells, start) {
+			$(cells).slice(start+1, cells.length).each(function(i, cell) {
+				console.log("Clearing cell: " + (i + start + 1));
+				cell.clear_output();
+			})
 		}
 
 		// All cells except hidden cells and the edit modal cell
