@@ -20,7 +20,7 @@ define([
 
 		*/
 
-		EDIT_CELL_CLASS = 'edit-mode-cell';
+		EDIT_CELL_CLASS = 'edit_mode_cell';
 
 		IPython.toolbar.add_buttons_group([{
 			'label': 'Edit',
@@ -36,6 +36,7 @@ define([
 					restore_command_mode();
 				}
 				toggle_edit_ui();
+				window.last_exec = -1;
 			}
 		}]);
 
@@ -127,6 +128,7 @@ define([
 			add_edit_shortcuts();
 			$('.edit_modal').show();
 			$('#no_edit_mode').attr('rel', 'stylesheet');
+			window.last_exec = -1;
 		}
 
 		function restore_command_mode() {
@@ -134,18 +136,35 @@ define([
 			restore_object('edits', edt);
 			$('.edit_modal').hide();
 			$('#no_edit_mode').attr('rel', 'edit-mode-deactivated');
+			window.last_exec = -1;
 		}
 
 		function add_edit_shortcuts() {
 			edt.add_shortcut('shift-enter', function() {
 				if (window.modal) {
-					run($('.modal_cell'));
+					run($('.edit_mode_cell'));
 				} else {
-					$('.code_cell:not(.modal_cell)').each(function() {
-						run(this);
-					});
+					var cells = $('.code_cell:not(.edit_mode_cell)');
+					var selected = cells.index($('.selected'));
+					var previous = window.last_exec
+					window.last_exec = selected;
+					if (selected < previous) {
+						IPython.notebook.clear_all_output();
+						run_slice(cells, 0, selected);
+					} else {
+						run_slice(cells, previous+1, selected);
+					}
 				}
 			});
+		}
+
+		function run_slice(cells, start, end) {
+			console.log(start, end);
+			cells.slice(start, end).each(function() {
+				console.log(this);
+				run(this);
+			})
+			run(cells[end]);
 		}
 
 		function freeze_object(variable, obj) {
@@ -176,7 +195,8 @@ define([
 					'.btn-group[id="insert_above_below"]',
 					'.btn-group[id="cut_copy_paste"]',
 					'.btn-group[id="move_up_down"]',
-					'.btn-group[id="run_int"] .btn:first-child',
+					'.btn-group[id="run_int"] .btn:nth-child(1)',
+					'.btn-group[id="run_int"] .btn:nth-child(2)',
 					'.form-control',
 					'.btn-group .navbar-text'
 				],

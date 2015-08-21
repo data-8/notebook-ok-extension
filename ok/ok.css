@@ -4,7 +4,7 @@ Integration of OK.
 @author: Alvin Wan
 @site: alvinwan.com
 */
-.edit_text,.button,.edit-mode-cell {
+.edit_text,.button,.edit_mode_cell {
 
 }
 .prompt, .input_prompt,body div.out_prompt_overlay.prompt {
@@ -14,7 +14,7 @@ Integration of OK.
 #notebook-container .cell {
     border:none;
 }
-#notebook-container .edit-mode-cell {
+#notebook-container .edit_mode_cell {
     position:fixed;
     bottom:-50%;
     right:5px;
