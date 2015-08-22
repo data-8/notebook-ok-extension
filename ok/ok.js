@@ -54,6 +54,7 @@ define([
 		Edit Mode Setup
 
 		- add a label to the edit button
+		- add change listeners & indices to all input cells
 		- select the first cell on load
 
 		*/
@@ -61,6 +62,19 @@ define([
 		function initialize_no_edit_mode() {
 			$('.fa-square-o').html('	Edit mode <b>off</b>').click().click()
 				.parents('.btn-group').css('float', 'right');
+			var i = 0;
+			$.each(get_normal_cells(), function (index, cell) {
+				console.log('Setting edit listener: ' + index);
+				var events = 'change keyup paste';
+				var input = cell.element.find('.input');
+				input.off(events); // Remove old indexing; which may have changed
+				input.on(events, function (event) {
+					if (window.last_exec > index) {
+						window.last_exec = index - 1;
+						console.log("Updated last_exec: " + window.last_exec);
+					}
+				});
+			});
 			select_cell($('.cell:first-child'));
 		}
 
@@ -148,12 +162,7 @@ define([
 			add_edit_shortcuts();
 			$('.edit_modal').show();
 			$('#no_edit_mode').attr('rel', 'stylesheet');
-			$.each(IPython.notebook.get_cells(), function() {
-				var text = this.get_text().toLowerCase();
-				if (text.startsWith("# hidden") || text.startsWith("# ok")) {
-					this.element.find('.input').hide();
-				}
-			});
+			hide_special_inputs()
 		}
 
 		function restore_command_mode() {
@@ -161,9 +170,7 @@ define([
 			restore_object('edits', edt);
 			$('.edit_modal').hide();
 			$('#no_edit_mode').attr('rel', 'edit-mode-deactivated');
-			$('.code_cell:not(.edit_mode_cell)').each(function() {
-				$(this).find('.input').show();
-			});
+			show_all_inputs();
 		}
 
 		function add_edit_shortcuts() {
@@ -171,26 +178,76 @@ define([
 				if (window.modal) {
 					run($('.edit_mode_cell'));
 				} else {
-					var cells = $('.code_cell:not(.edit_mode_cell)');
-					var selected = cells.index($('.selected'));
+					var cells = get_normal_cells();
+					console.log(cells);
+					// Index of selected cell
+					var selected = $(cells).map(function(i, c) {
+						if (c.selected) {
+							return i;
+						}
+					})[0];
+					if (!isFinite(selected)) {
+						console.log("No selected cell: " + cells);
+						return;
+					}
+					console.log("Selected index: " + selected);
+
+					$(get_ok_cells()).each(function (i, cell) {
+						cell.clear_output()
+					});
+
 					var previous = window.last_exec
 					window.last_exec = selected;
+					console.log("Updated last_exec: " + window.last_exec);
 					if (selected < previous) {
+						IPython.notebook.clear_all_output()
 						run_slice(cells, 0, selected);
+					} else if (selected == previous) {
+						clear_below(cells, selected);
+						run_slice(cells, selected, selected);
 					} else {
+						clear_below(cells, selected);
 						run_slice(cells, previous+1, selected);
 					}
 				}
 			});
 		}
 
-		function run_slice(cells, start, end) {
-			console.log(start, end);
-			cells.slice(start, end).each(function() {
-				console.log(this);
-				run(this);
+		function clear_below(cells, start) {
+			$(cells).slice(start+1, cells.length).each(function(i, cell) {
+				console.log("Clearing cell: " + (i + start + 1));
+				cell.clear_output();
 			})
-			run(cells[end]);
+		}
+
+		// All cells except hidden cells and the edit modal cell
+		function get_normal_cells() {
+			var all = IPython.notebook.get_cells()
+			return all.filter(function (cell) {
+				if (cell.cell_type != "code") { return false; }
+				if (is_special_cell(cell)) { return false; }
+				return true;
+			});
+		}
+
+		function get_ok_cells() {
+			var all = IPython.notebook.get_cells()
+			return all.filter(function (cell) {
+				if (cell.cell_type != "code") { return false; }
+				var text = cell.get_text().toLowerCase();
+				return text.startsWith("# ok");
+			});
+		}
+
+		function run_slice(cells, start, end) {
+			$(cells).slice(start, end+1).each(function(i, cell) {
+				console.log("Clearing cell: " + (i + start));
+				cell.clear_output();
+			});
+			$(cells).slice(start, end+1).each(function(i, cell) {
+				console.log("Executing cell: " + (i + start));
+				cell.execute();
+			});
 		}
 
 		function freeze_object(variable, obj) {
@@ -206,6 +263,28 @@ define([
 			for (var key in window[variable]) {
 				obj[key] = window[variable][key];
 			}
+		}
+
+		function hide_special_inputs() {
+			$.each(IPython.notebook.get_cells(), function() {
+				if (is_special_cell(this)) {
+					this.element.find('.input').hide();
+				}
+			});
+		}
+
+		function is_special_cell(cell) {
+			var text = cell.get_text().toLowerCase();
+			if(text.startsWith("# hidden")) { return true; }
+			if(text.startsWith("# ok")) { return true; }
+			if(cell.element.hasClass(EDIT_CELL_CLASS)) { return true; }
+			return false;
+		}
+
+		function show_all_inputs() {
+			$('.code_cell:not(.edit_mode_cell)').each(function() {
+				$(this).find('.input').show();
+			});
 		}
 
 		function toggle_edit_ui() {
