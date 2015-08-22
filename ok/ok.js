@@ -64,8 +64,11 @@ define([
 				.parents('.btn-group').css('float', 'right');
 			var i = 0;
 			$.each(get_normal_cells(), function (index, cell) {
-				cell.normal_cell_index = index;
-				cell.element.find('.input').on('change keyup paste', function (event) {
+				console.log('Setting edit listener: ' + index);
+				var events = 'change keyup paste';
+				var input = cell.element.find('.input');
+				input.off(events); // Remove old indexing; which may have changed
+				input.on(events, function (event) {
 					if (window.last_exec > index) {
 						window.last_exec = index - 1;
 						console.log("Updated last_exec: " + window.last_exec);
@@ -195,6 +198,7 @@ define([
 
 					var previous = window.last_exec
 					window.last_exec = selected;
+					console.log("Updated last_exec: " + window.last_exec);
 					if (selected < previous) {
 						IPython.notebook.clear_all_output()
 						run_slice(cells, 0, selected);
